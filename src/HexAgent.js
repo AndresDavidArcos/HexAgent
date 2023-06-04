@@ -85,33 +85,73 @@ function twoBridgesScore(board, player) {
         score = 999999999
       } else {
         let startIndex = 1; 
-        let endIndex = possibleMoves.length - 1; 
+        let endIndex = path0.length - 1; 
         
         for (let i = startIndex; i < endIndex; i++) {
-          const squareId = possibleMoves[i];
+          const squareId = path0[i];
           let row = Math.floor(squareId / board.length)
           let col = squareId % board.length
-          if(board[row-1][col+2] === player) twoBridges++;
-          if(board[row+1][col-2] === player) twoBridges++;
-          if(board[row-1][col-1] === player) twoBridges++;
-          if(board[row+1][col+1] === player) twoBridges++;
-          if(board[row+2][col-1] === player) twoBridges++;
-          if(board[row-2][col+1] === player) twoBridges++;
+          
+          try {
+            if (board[row-1][col+2] === '1') twoBridges+=2;
+          } catch (error) {
+          }    
+          try {
+            if (board[row+1][col-2] === '1') twoBridges+=2;
+          } catch (error) {
+          }    
+          try {
+            if (board[row-1][col-1] === '1') twoBridges++;
+          } catch (error) {
+          }    
+          try {
+            if (board[row+1][col+1] === '1') twoBridges++;
+          } catch (error) {
+          }    
+          try {
+            if (board[row+2][col-1] === '1') twoBridges++;
+          } catch (error) {
+          }    
+          try {
+            if (board[row-2][col+1] === '1') twoBridges++;
+          } catch (error) {
+          }   
         }        
- 
-
         
-      
-        path1.forEach(squareId => {
+        startIndex = 1; 
+        endIndex = path1.length - 1; 
+        
+        for (let i = startIndex; i < endIndex; i++) {
+          const squareId = path0[i];
           let row = Math.floor(squareId / board.length)
           let col = squareId % board.length
-          if (board[row-1][col+2] !== player && board[row-1][col+2] !== 0) twoBridgesAdversary++;
-          if (board[row+1][col-2] !== player && board[row+1][col-2] !== 0) twoBridgesAdversary++;
-          if (board[row-1][col-1] !== player && board[row-1][col-1] !== 0) twoBridgesAdversary++;
-          if (board[row+1][col+1] !== player && board[row+1][col+1] !== 0) twoBridgesAdversary++;
-          if (board[row+2][col-1] !== player && board[row+2][col-1] !== 0) twoBridgesAdversary++;
-          if (board[row-2][col+1] !== player && board[row-2][col+1] !== 0) twoBridgesAdversary++;       
-        })
+          
+          try {
+            if (board[row-1][col+2] === '1') twoBridgesAdversary+=2;
+          } catch (error) {
+          }    
+          try {
+            if (board[row+1][col-2] === '1') twoBridgesAdversary+=2;
+          } catch (error) {
+          }    
+          try {
+            if (board[row-1][col-1] === '1') twoBridgesAdversary++;
+          } catch (error) {
+          }    
+          try {
+            if (board[row+1][col+1] === '1') twoBridgesAdversary++;
+          } catch (error) {
+          }    
+          try {
+            if (board[row+2][col-1] === '1') twoBridgesAdversary++;
+          } catch (error) {
+          }    
+          try {
+            if (board[row-2][col+1] === '1') twoBridgesAdversary++;
+          } catch (error) {
+          }   
+        }                
+        
       }
     }
   }
@@ -156,16 +196,16 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
       return [boardS.boardScore(board, '1'), null]
     }else{
       if(profundidad === 0 || movements.length === 2){
-        return [boardS.boardScore(board, '1'), null]
+        return [boardS.boardScore(board, '1')+twoBridgesScore(board, '1'), null]
       }
     }
   }else {    
       let movements = boardS.boardPath(transposeHex(board))
       if(movements === null){
-        return [boardS.boardScore(board, '2'), null]
+        return [boardS.boardScore(board, '1'), null]
       }else
         if(profundidad === 0 || movements.length === 2) {
-        return [boardS.boardScore(board, '2'), null];
+        return [boardS.boardScore(board, '1')+twoBridgesScore(board, '1'), null];
       }
     
   }
@@ -178,7 +218,37 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
     let possibleMoves = boardS.boardPath(board);
     let startIndex = 1; 
     let endIndex = possibleMoves.length - 1; 
-    
+    let twoBridgesCandidates = [];
+    for (let i = startIndex; i < endIndex; i++) {
+      const squareId = possibleMoves[i];
+      let row = Math.floor(squareId / board.length)
+      let col = squareId % board.length    
+      try {
+        if (board[row-1][col+2] === 0) twoBridgesCandidates.push(row-1 * board.length + col+2);
+      } catch (error) {
+      }    
+      try {
+        if (board[row+1][col-2] === 0) twoBridgesCandidates.push(row+1 * board.length + col-2);
+      } catch (error) {
+      }    
+      try {
+        if (board[row-1][col-1] === 0) twoBridgesCandidates.push(row-1 * board.length + col-1);
+      } catch (error) {
+      }    
+      try {
+        if (board[row+1][col+1] === 0) twoBridgesCandidates.push(row+1 * board.length + col+1);
+      } catch (error) {
+      }    
+      try {
+        if (board[row+2][col-1] === 0) twoBridgesCandidates.push(row+2 * board.length + col-1);
+      } catch (error) {
+      }    
+      try {
+        if (board[row-2][col+1] === 0) twoBridgesCandidates.push(row-2 * board.length + col+1);
+      } catch (error) {
+      }      
+    }
+    possibleMoves = possibleMoves.concat(twoBridgesCandidates);
     for (let i = startIndex; i < endIndex; i++) {
       const squareId = possibleMoves[i];
       let row = Math.floor(squareId / board.length)
@@ -203,6 +273,38 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
     let possibleMoves = boardS.boardPath(transposeHex(board));
     let startIndex = 1; 
     let endIndex = possibleMoves.length - 1; 
+
+    let twoBridgesCandidates = [];
+    for (let i = startIndex; i < endIndex; i++) {
+      const squareId = possibleMoves[i];
+      let row = Math.floor(squareId / board.length)
+      let col = squareId % board.length    
+      try {
+        if (board[row-1][col+2] === 0) twoBridgesCandidates.push(row-1 * board.length + col+2);
+      } catch (error) {
+      }    
+      try {
+        if (board[row+1][col-2] === 0) twoBridgesCandidates.push(row+1 * board.length + col-2);
+      } catch (error) {
+      }    
+      try {
+        if (board[row-1][col-1] === 0) twoBridgesCandidates.push(row-1 * board.length + col-1);
+      } catch (error) {
+      }    
+      try {
+        if (board[row+1][col+1] === 0) twoBridgesCandidates.push(row+1 * board.length + col+1);
+      } catch (error) {
+      }    
+      try {
+        if (board[row+2][col-1] === 0) twoBridgesCandidates.push(row+2 * board.length + col-1);
+      } catch (error) {
+      }    
+      try {
+        if (board[row-2][col+1] === 0) twoBridgesCandidates.push(row-2 * board.length + col+1);
+      } catch (error) {
+      }      
+    }
+    possibleMoves = possibleMoves.concat(twoBridgesCandidates);
 
     for(let j = startIndex; j < endIndex; j++){
       let squareId = possibleMoves[j];
