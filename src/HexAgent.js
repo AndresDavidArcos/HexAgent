@@ -17,9 +17,13 @@ class HexAgent extends Agent {
    */
   send() {
     let board = this.perception;
+    // console.log("====> board: " + board);
     let size = board.length;
+    // console.log("====> size: " + size);
     let available = getEmptyHex(board);
+    // console.log("====> available: " + available);
     let nTurn = size * size - available.length;
+    // console.log("====> nTurn: " + nTurn);
     return moveGame(board, size, available, nTurn)
 
   }
@@ -169,7 +173,10 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
         max_eval = evaluation;
         bestMove = [row, col];
       }
+
+      // Actualiza el valor de alfa con el máximo entre el valor actual y evaluation.
       alfa = Math.max(alfa, evaluation);
+      // Realiza la poda alfa-beta verificando si beta es menor o igual a alfa. Si se cumple, se interrumpe el bucle.
       if (beta <= alfa) {
         break;
       }
@@ -179,10 +186,15 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
   } else {
     let min_eval = Number.POSITIVE_INFINITY;
     let bestMove = null;
+    // Cuando no es el turno del jugador maximizador, se transpone el tablero utilizando la función transposeHex
+    // para intercambiar los roles de los jugadores
     let possibleMoves = boardS.boardPath(transposeHex(board));
     let startIndex = 1; 
     let endIndex = possibleMoves.length - 1; 
 
+    // El ciclo for itera sobre los movimientos disponibles (possibleMoves) y realiza la transposición de cada movimiento.
+    // Este proceso de transposición de movimientos permite que el algoritmo continúe evaluando el tablero correctamente, 
+    // considerando el cambio de roles entre los jugadores.
     for(let j = startIndex; j < endIndex; j++){
       let squareId = possibleMoves[j];
       let row = Math.floor(squareId / board.length)
@@ -191,6 +203,7 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
       possibleMoves[j] = newId;
     }
     
+    // Realiza los mismos pasos que en el caso anterior, pero cambiando los roles de maximización y minimización.
     for (let i = startIndex; i < endIndex; i++) {
       const squareId = possibleMoves[i];
       let row = Math.floor(squareId / board.length)
@@ -202,7 +215,10 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
         min_eval = evaluation;
         bestMove = [row, col];
       }
+
+      // Actualiza el valor de beta con el minimo entre el valor actual y evaluation.
       beta = Math.min(beta, evaluation);
+      // Realiza la poda alfa-beta verificando si beta es menor o igual a alfa. Si se cumple, se interrumpe el bucle.
       if (beta <= alfa) {
         break; 
       }
