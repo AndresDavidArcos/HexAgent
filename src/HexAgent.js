@@ -74,6 +74,7 @@ function twoBridgesScore(board, player) {
   let path0 = boardS.boardPath(board);
   let twoBridges = 0;
   let twoBridgesAdversary = 0;
+  let score  = 0;
   if (!path0) {
     score = -999999999
   } else {
