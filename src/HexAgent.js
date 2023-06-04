@@ -69,125 +69,139 @@ function moveGame(board, size, available, nTurn) {
 
 }
 
+function getOccupiedCells(board) {
+  const occupiedCells = [];
+  const rows = board.length;
+  const columns = board[0].length;
 
-function twoBridgesScore(board, player) {
-  let path0 = boardS.boardPath(board);
-  let twoBridges = 0;
-  let twoBridgesAdversary = 0;
-  let score  = 0;
-  if (!path0) {
-    score = -999999999
-  } else {
-    if (path0.length === 2) {
-      score = 999999999;
-    } else {
-      let path1 = boardS.boardPath(transposeHex(board));
-      if (!path1) {
-        score = 999999999
-      } else {
-        let startIndex = 1; 
-        let endIndex = path0.length - 1; 
-        
-        for (let i = startIndex; i < endIndex; i++) {
-          const squareId = path0[i];
-          let row = Math.floor(squareId / board.length)
-          let col = squareId % board.length
-          
-          try {
-            if (board[row-1][col+2] === '1') twoBridges+=2;
-          } catch (error) {
-          }    
-          try {
-            if (board[row+1][col-2] === '1') twoBridges+=2;
-          } catch (error) {
-          }    
-          try {
-            if (board[row-1][col-1] === '1') twoBridges++;
-          } catch (error) {
-          }    
-          try {
-            if (board[row+1][col+1] === '1') twoBridges++;
-          } catch (error) {
-          }    
-          try {
-            if (board[row+2][col-1] === '1') twoBridges++;
-          } catch (error) {
-          }    
-          try {
-            if (board[row-2][col+1] === '1') twoBridges++;
-          } catch (error) {
-          }   
-        }        
-        
-        startIndex = 1; 
-        endIndex = path1.length - 1; 
-        
-        for (let i = startIndex; i < endIndex; i++) {
-          const squareId = path0[i];
-          let row = Math.floor(squareId / board.length)
-          let col = squareId % board.length
-          
-          try {
-            if (board[row-1][col+2] === '1') twoBridgesAdversary+=2;
-          } catch (error) {
-          }    
-          try {
-            if (board[row+1][col-2] === '1') twoBridgesAdversary+=2;
-          } catch (error) {
-          }    
-          try {
-            if (board[row-1][col-1] === '1') twoBridgesAdversary++;
-          } catch (error) {
-          }    
-          try {
-            if (board[row+1][col+1] === '1') twoBridgesAdversary++;
-          } catch (error) {
-          }    
-          try {
-            if (board[row+2][col-1] === '1') twoBridgesAdversary++;
-          } catch (error) {
-          }    
-          try {
-            if (board[row-2][col+1] === '1') twoBridgesAdversary++;
-          } catch (error) {
-          }   
-        }                
-        
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columns; col++) {
+      if (board[row][col] === '1') {
+        const cellId = row * columns + col;
+        occupiedCells.push(cellId);
       }
     }
   }
 
-  
-  score = twoBridges-twoBridgesAdversary;          
-  
+  return occupiedCells;
+}
+
+
+function twoBridgesScore(board, player) {
+  let occupiedCells = getOccupiedCells(board);
+  console.log(occupiedCells);
+  let twoBridges = 0;
+  let twoBridgesAdversary = 0;
+  let score = 0;
+  let adversaryBoard = transposeHex(board);
+  let adversaryOcupiedCells = getOccupiedCells(adversaryBoard);
+  console.log(adversaryOcupiedCells);
+
+  occupiedCells.forEach((cellId) => {
+    let row = Math.floor(cellId / board.length);
+    let col = cellId % board.length;
+    try {
+      if (board[row - 1][col + 2] === '1') {
+        twoBridges += 4;
+      }
+    } catch (error) {}
+
+    try {
+      if (board[row + 1][col - 2] === '1') {
+        twoBridges += 4;
+      }
+    } catch (error) {}
+
+    try {
+      if (board[row - 1][col - 1] === '1') {
+        twoBridges += 2;
+      }
+    } catch (error) {}
+
+    try {
+      if (board[row + 1][col + 1] === '1') {
+        twoBridges += 2;
+      }
+    } catch (error) {}
+
+    try {
+      if (board[row + 2][col - 1] === '1') {
+        twoBridges += 2
+      }
+    } catch (error) {}
+
+    try {
+      if (board[row - 2][col + 1] === '1') {
+        twoBridges += 2;
+      }
+    } catch (error) {}
+  });
+
+  adversaryOcupiedCells.forEach((cellId) => {
+    let row = Math.floor(cellId / board.length);
+    let col = cellId % board.length;
+    try {
+      if (adversaryBoard[row - 1][col + 2] === '1') {
+        twoBridgesAdversary += 4;
+      }
+    } catch (error) {}
+
+    try {
+      if (adversaryBoard[row + 1][col - 2] === '1') {
+        twoBridgesAdversary += 4;
+      }
+    } catch (error) {}
+
+    try {
+      if (adversaryBoard[row - 1][col - 1] === '1') {
+        twoBridgesAdversary+=2;
+      }
+    } catch (error) {}
+
+    try {
+      if (adversaryBoard[row + 1][col + 1] === '1') {
+        twoBridgesAdversary+=2;
+      }
+    } catch (error) {}
+
+    try {
+      if (adversaryBoard[row + 2][col - 1] === '1') {
+        twoBridgesAdversary+=2;
+      }
+    } catch (error) {}
+
+    try {
+      if (adversaryBoard[row - 2][col + 1] === '1') {
+        twoBridgesAdversary+=2;
+      }
+    } catch (error) {}
+  });
+
+  score = twoBridges/2 - twoBridgesAdversary/2;
+
+  if (score !== 0) {
+    console.log("score: ", score, twoBridges, twoBridgesAdversary);
+    console.log(board);
+    process.exit();
+  }
+
   return player === '1' ? score : -score;
 }
+
+  
+let testboard =  [
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, '1', 0],
+  [0, 0, 0, '1', 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0]
+]
+//console.log(twoBridgesScore(testboard, '1'))
 /*
 
 */
-let contadorIteraciones = 0;
-function centralControlScore(board, player){
-
-  let path0 = boardS.boardPath(board);
-  let path1 = boardS.boardPath(transposeHex(board));
-
-  // let control = 0;
-  // let controlAdversary = 0;
-
-  // path0.forEach(squareId => {
-  //   let row = Math.floor(squareId / board.length)
-  //   let col = squareId % board.length
-  //   if (row >= 3 && row <= 7 && col >= 3 && col <= 6) control++;
-  // })
-  // path1.forEach(squareId => {
-  //   let row = Math.floor(squareId / board.length)
-  //   let col = squareId % board.length
-  //   if (row >= 3 && row <= 7 && col >= 3 && col <= 6) controlAdversary++;
-  // })
-  // score = control-controlAdversary;          
-  
-  // return player === '1' ? score : -score;
-}
 
 function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, beta = Number.MAX_SAFE_INTEGER) {
 
