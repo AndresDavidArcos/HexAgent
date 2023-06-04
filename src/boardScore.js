@@ -194,7 +194,6 @@ let board = [[0, 0, '2'],
 [0, 0, '2'],
 ['2', '2', '2']];
 
-console.log(boardPath(board))
 // console.log(transpose(board))
 // console.log(boardPath(transpose(board)))
 // let id = (boardPath(transpose(board)))[1]

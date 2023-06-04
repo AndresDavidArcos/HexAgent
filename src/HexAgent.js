@@ -54,7 +54,7 @@ function moveGame(board, size, available, nTurn) {
     return [Math.floor(size / 2), Math.floor(size / 2)];
   }
 
-  let profundidad = 7;
+  let profundidad = 8;
 
   if (nTurn % 2 == 0) {
     let [evaluation, bestMove] = minmax(board, profundidad, true)
@@ -72,30 +72,51 @@ function moveGame(board, size, available, nTurn) {
 
 function twoBridgesScore(board, player) {
   let path0 = boardS.boardPath(board);
-  let path1 = boardS.boardPath(transposeHex(board));
   let twoBridges = 0;
   let twoBridgesAdversary = 0;
-  path0.forEach(squareId => {
-    let row = Math.floor(squareId / board.length)
-    let col = squareId % board.length
-    if(board[row-1][col+2] === player) twoBridges++;
-    if(board[row+1][col-2] === player) twoBridges++;
-    if(board[row-1][col-1] === player) twoBridges++;
-    if(board[row+1][col+1] === player) twoBridges++;
-    if(board[row+2][col-1] === player) twoBridges++;
-    if(board[row-2][col+1] === player) twoBridges++;
-  })
+  if (!path0) {
+    score = -999999999
+  } else {
+    if (path0.length === 2) {
+      score = 999999999;
+    } else {
+      let path1 = boardS.boardPath(transposeHex(board));
+      if (!path1) {
+        score = 999999999
+      } else {
+        let startIndex = 1; 
+        let endIndex = possibleMoves.length - 1; 
+        
+        for (let i = startIndex; i < endIndex; i++) {
+          const squareId = possibleMoves[i];
+          let row = Math.floor(squareId / board.length)
+          let col = squareId % board.length
+          if(board[row-1][col+2] === player) twoBridges++;
+          if(board[row+1][col-2] === player) twoBridges++;
+          if(board[row-1][col-1] === player) twoBridges++;
+          if(board[row+1][col+1] === player) twoBridges++;
+          if(board[row+2][col-1] === player) twoBridges++;
+          if(board[row-2][col+1] === player) twoBridges++;
+        }        
+ 
 
-  path1.forEach(squareId => {
-    let row = Math.floor(squareId / board.length)
-    let col = squareId % board.length
-    if (board[row-1][col+2] !== player && board[row-1][col+2] !== 0) twoBridgesAdversary++;
-    if (board[row+1][col-2] !== player && board[row+1][col-2] !== 0) twoBridgesAdversary++;
-    if (board[row-1][col-1] !== player && board[row-1][col-1] !== 0) twoBridgesAdversary++;
-    if (board[row+1][col+1] !== player && board[row+1][col+1] !== 0) twoBridgesAdversary++;
-    if (board[row+2][col-1] !== player && board[row+2][col-1] !== 0) twoBridgesAdversary++;
-    if (board[row-2][col+1] !== player && board[row-2][col+1] !== 0) twoBridgesAdversary++;       
-  })
+        
+      
+        path1.forEach(squareId => {
+          let row = Math.floor(squareId / board.length)
+          let col = squareId % board.length
+          if (board[row-1][col+2] !== player && board[row-1][col+2] !== 0) twoBridgesAdversary++;
+          if (board[row+1][col-2] !== player && board[row+1][col-2] !== 0) twoBridgesAdversary++;
+          if (board[row-1][col-1] !== player && board[row-1][col-1] !== 0) twoBridgesAdversary++;
+          if (board[row+1][col+1] !== player && board[row+1][col+1] !== 0) twoBridgesAdversary++;
+          if (board[row+2][col-1] !== player && board[row+2][col-1] !== 0) twoBridgesAdversary++;
+          if (board[row-2][col+1] !== player && board[row-2][col+1] !== 0) twoBridgesAdversary++;       
+        })
+      }
+    }
+  }
+
+  
   score = twoBridges-twoBridgesAdversary;          
   
   return player === '1' ? score : -score;
