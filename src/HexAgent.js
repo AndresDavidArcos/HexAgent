@@ -31,7 +31,7 @@ module.exports = HexAgent;
 /**
  * Return an array containing the id of the empty hex in the board
  * id = row * size + col;
- * @param {Matrix} board 
+ * @param {board} board 
  */
 function getEmptyHex(board) {
   let result = [];
@@ -54,7 +54,7 @@ function moveGame(board, size, available, nTurn) {
     return [Math.floor(size / 2), Math.floor(size / 2)];
   }
 
-  let profundidad = 8;
+  let profundidad = 4;
 
   if (nTurn % 2 == 0) {
     let [evaluation, bestMove] = minmax(board, profundidad, true)
@@ -89,13 +89,11 @@ function getOccupiedCells(board) {
 
 function twoBridgesScore(board, player) {
   let occupiedCells = getOccupiedCells(board);
-  console.log(occupiedCells);
   let twoBridges = 0;
   let twoBridgesAdversary = 0;
   let score = 0;
   let adversaryBoard = transposeHex(board);
   let adversaryOcupiedCells = getOccupiedCells(adversaryBoard);
-  console.log(adversaryOcupiedCells);
 
   occupiedCells.forEach((cellId) => {
     let row = Math.floor(cellId / board.length);
@@ -179,11 +177,11 @@ function twoBridgesScore(board, player) {
 
   score = twoBridges/2 - twoBridgesAdversary/2;
 
-  if (score !== 0) {
-    console.log("score: ", score, twoBridges, twoBridgesAdversary);
-    console.log(board);
-    process.exit();
-  }
+  // if (score !== 0) {
+  //   console.log("score: ", score, twoBridges, twoBridgesAdversary);
+  //   console.log(board);
+  //   process.exit();
+  // }
 
   return player === '1' ? score : -score;
 }
@@ -231,47 +229,45 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
     let max_eval = Number.NEGATIVE_INFINITY;
     let bestMove = null;
     let possibleMoves = boardS.boardPath(board);
-    let startIndex = 1; 
-    let endIndex = possibleMoves.length - 1; 
+    possibleMoves.shift();
+    possibleMoves.pop();
     let twoBridgesCandidates = [];
-    for (let i = startIndex; i < endIndex; i++) {
-      const squareId = possibleMoves[i];
+    possibleMoves.forEach(squareId => {
       let row = Math.floor(squareId / board.length)
       let col = squareId % board.length    
       try {
-        if (board[row-1][col+2] === 0) twoBridgesCandidates.push(row-1 * board.length + col+2);
-      } catch (error) {
-      }    
+        if (board[row - 1][col + 2] === 0) twoBridgesCandidates.push(String((row - 1) * board.length + col + 2));
+      } catch (error) {}
+      
       try {
-        if (board[row+1][col-2] === 0) twoBridgesCandidates.push(row+1 * board.length + col-2);
-      } catch (error) {
-      }    
+        if (board[row + 1][col - 2] === 0) twoBridgesCandidates.push(String((row + 1) * board.length + col - 2));
+      } catch (error) {}
+      
       try {
-        if (board[row-1][col-1] === 0) twoBridgesCandidates.push(row-1 * board.length + col-1);
-      } catch (error) {
-      }    
+        if (board[row - 1][col - 1] === 0) twoBridgesCandidates.push(String((row - 1) * board.length + col - 1));
+      } catch (error) {}
+      
       try {
-        if (board[row+1][col+1] === 0) twoBridgesCandidates.push(row+1 * board.length + col+1);
-      } catch (error) {
-      }    
+        if (board[row + 1][col + 1] === 0) twoBridgesCandidates.push(String((row + 1) * board.length + col + 1));
+      } catch (error) {}
+      
       try {
-        if (board[row+2][col-1] === 0) twoBridgesCandidates.push(row+2 * board.length + col-1);
-      } catch (error) {
-      }    
+        if (board[row + 2][col - 1] === 0) twoBridgesCandidates.push(String((row + 2) * board.length + col - 1));
+      } catch (error) {}
+      
       try {
-        if (board[row-2][col+1] === 0) twoBridgesCandidates.push(row-2 * board.length + col+1);
-      } catch (error) {
-      }      
-    }
+        if (board[row - 2][col + 1] === 0) twoBridgesCandidates.push(String((row - 2) * board.length + col + 1));
+      } catch (error) {}   
+    })
+    
     possibleMoves = possibleMoves.concat(twoBridgesCandidates);
-    for (let i = startIndex; i < endIndex; i++) {
-      const squareId = possibleMoves[i];
-      let row = Math.floor(squareId / board.length)
-      let col = squareId % board.length
+    for (let squareId of possibleMoves) {
+      let row = Math.floor(squareId / board.length);
+      let col = squareId % board.length;
       let temp_board = cloneDeep(board);
-      temp_board[row][col] = '1'
-      let evaluation = minmax(temp_board, profundidad - 1, false, alfa, beta)[0]
-      if(evaluation > max_eval){
+      temp_board[row][col] = '1';
+      let evaluation = minmax(temp_board, profundidad - 1, false, alfa, beta)[0];
+      if (evaluation > max_eval) {
         max_eval = evaluation;
         bestMove = [row, col];
       }
@@ -279,58 +275,52 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
       if (beta <= alfa) {
         break;
       }
-    }
-    return [max_eval, bestMove];    
- 
+    }    
+    return [max_eval, bestMove];     
   } else {
     let min_eval = Number.POSITIVE_INFINITY;
     let bestMove = null;
     let possibleMoves = boardS.boardPath(transposeHex(board));
-    let startIndex = 1; 
-    let endIndex = possibleMoves.length - 1; 
-
+    possibleMoves.shift();
+    possibleMoves.pop();
     let twoBridgesCandidates = [];
-    for (let i = startIndex; i < endIndex; i++) {
-      const squareId = possibleMoves[i];
+    possibleMoves.forEach(squareId => {
       let row = Math.floor(squareId / board.length)
       let col = squareId % board.length    
       try {
-        if (board[row-1][col+2] === 0) twoBridgesCandidates.push(row-1 * board.length + col+2);
-      } catch (error) {
-      }    
+        if (board[row - 1][col + 2] === 0) twoBridgesCandidates.push(String((row - 1) * board.length + col + 2));
+      } catch (error) {}
+      
       try {
-        if (board[row+1][col-2] === 0) twoBridgesCandidates.push(row+1 * board.length + col-2);
-      } catch (error) {
-      }    
+        if (board[row + 1][col - 2] === 0) twoBridgesCandidates.push(String((row + 1) * board.length + col - 2));
+      } catch (error) {}
+      
       try {
-        if (board[row-1][col-1] === 0) twoBridgesCandidates.push(row-1 * board.length + col-1);
-      } catch (error) {
-      }    
+        if (board[row - 1][col - 1] === 0) twoBridgesCandidates.push(String((row - 1) * board.length + col - 1));
+      } catch (error) {}
+      
       try {
-        if (board[row+1][col+1] === 0) twoBridgesCandidates.push(row+1 * board.length + col+1);
-      } catch (error) {
-      }    
+        if (board[row + 1][col + 1] === 0) twoBridgesCandidates.push(String((row + 1) * board.length + col + 1));
+      } catch (error) {}
+      
       try {
-        if (board[row+2][col-1] === 0) twoBridgesCandidates.push(row+2 * board.length + col-1);
-      } catch (error) {
-      }    
+        if (board[row + 2][col - 1] === 0) twoBridgesCandidates.push(String((row + 2) * board.length + col - 1));
+      } catch (error) {}
+      
       try {
-        if (board[row-2][col+1] === 0) twoBridgesCandidates.push(row-2 * board.length + col+1);
-      } catch (error) {
-      }      
-    }
+        if (board[row - 2][col + 1] === 0) twoBridgesCandidates.push(String((row - 2) * board.length + col + 1));
+      } catch (error) {}     
+    })
     possibleMoves = possibleMoves.concat(twoBridgesCandidates);
 
-    for(let j = startIndex; j < endIndex; j++){
-      let squareId = possibleMoves[j];
+    possibleMoves.forEach((squareId, index) => {
       let row = Math.floor(squareId / board.length)
       let col = squareId % board.length
       let newId = col * board.length + row;
-      possibleMoves[j] = newId;
-    }
-    
-    for (let i = startIndex; i < endIndex; i++) {
-      const squareId = possibleMoves[i];
+      possibleMoves[index] = String(newId);
+    })
+
+    for (let squareId of possibleMoves) {
       let row = Math.floor(squareId / board.length)
       let col = squareId % board.length
       let temp_board = cloneDeep(board);
@@ -344,7 +334,7 @@ function minmax(board, profundidad, maxplayer, alfa = Number.MIN_SAFE_INTEGER, b
       if (beta <= alfa) {
         break; 
       }
-    }
+    }    
     return [min_eval, bestMove];
   }
 }
