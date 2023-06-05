@@ -86,6 +86,16 @@ function getOccupiedCells(board) {
   return occupiedCells;
 }
 
+// Una vez ya tenido añadidos a la lista de movimientos que puede hacer el agente 
+// aquellos que son una oportunidad para un puente doble, la funcion twoBridgesScore
+//  se encargara de revisar aquellas posiciones ocupadas por el jugador para ver si 
+//  forman algun puente doble, le asignara un puntaje de 4 a aquellos puentes que se 
+//  den partiendo desde una ficha ocupada dos columas mas adelante y una fila mas arriba,
+//   pues este puente se acerca mas a la pared con la que ganara el jugador, lo mismo pasa
+//    con aquel puente que se puede dar partiendo desde una ficha ocupada dos columnas 
+//    hacia atras y una fla hacia abajo. Los demas puentes que se pueden formar desde la
+//     ficha ocupada tendran un valor menor de solo 2 puntos.
+//    La funcion guardara el puntaje total de puentes del jugador y hara el mismo proceso pero desde la perspectiva de su adversario obteniendo también su puntaje de puentes, y lo que retornara esa funcion sera la resta del puntaje de puentes del jugador menos el de su adversario. 
 
 function twoBridgesScore(board, player) {
   let occupiedCells = getOccupiedCells(board);
